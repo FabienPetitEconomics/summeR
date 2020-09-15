@@ -11,7 +11,9 @@ packages <- c(
   # Graphics
   "ggplot2", "ggrepel", "RColorBrewer", "grid", "ggpubr", "gridExtra",
   # Tables
-  "texreg")
+  "texreg",
+  # Knitr and Kable
+  "kableExtra", "knitr")
 # Load packages
 lapply(packages, require, character.only = TRUE)
 # Clear

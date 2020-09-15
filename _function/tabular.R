@@ -37,11 +37,6 @@ tabular = function(list_to_display,
                         paste0("\\cmidrule(lr){2-", length(list_to_display)+1, "}"))
   }
   
-  # PSEUDO R2 in BINOMIAL LOGISTIC REGRESSION
-  if(grep("Log", gof[1])==1){
-    gof = c(pseudoR2(list_to_display), gof)
-  }
-  
   # CORE GROUPS
   if(!is.null(groups)){
     empty_line = NULL
@@ -65,11 +60,17 @@ tabular = function(list_to_display,
     gof.row.table = paste0(string, "} \\\\")
   }
   
+  # PSEUDO R2 in BINOMIAL LOGISTIC REGRESSION
+  if(grep("Log", gof[1])==1){
+    gof = c(pseudoR2(list_to_display), gof)
+  }
+  
   # GOF MULTICOLUMN CENTER
-  gof = gof %>% str_replace(" & ", " &\\\\multicolumn{1}{c}{") %>% 
-    str_replace_all(" & ", " } &\\\\multicolumn{1}{c}{") %>% 
-    str_replace_all("\\\\\\\\", "}\\\\\\\\") %>% 
-    str_remove_all(" ")
+  gof = gof %>% 
+    str_replace_all("\\s+", " ") %>% 
+    str_replace(" & ", " &\\\\multicolumn{1}{c}{") %>% 
+    str_replace_all(" & ", "} &\\\\multicolumn{1}{c}{") %>% 
+    str_replace_all(" \\\\\\\\", "}\\\\\\\\")
   
   # GROUPS MODEL
   if(!is.null(group.models)){
