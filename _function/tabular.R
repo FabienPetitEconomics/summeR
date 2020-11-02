@@ -61,7 +61,7 @@ tabular = function(list_to_display,
   }
   
   # PSEUDO R2 in BINOMIAL LOGISTIC REGRESSION
-  if(grep("Log", gof[1])==1){
+  if(sum(grep("Log", gof[1]))==1){
     gof = c(pseudoR2(list_to_display), gof)
   }
   
