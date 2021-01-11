@@ -16,10 +16,14 @@ tabular = function(list_to_display,
     dcolumn = TRUE,
     include.aic = FALSE,
     include.bic = FALSE,
-    include.dev = FALSE, ...
+    include.dev = FALSE, # beside = T, include.group = F, include.loglik = F
+    ...
   ) %>% 
     strsplit("\n") %>% 
     unlist
+  
+  # Count the number of & in column [Because length(list_to_display) does is reduced for multinomial reg]
+  esperluette_number = lengths(regmatches(table_split[6], gregexpr("&", table_split[6])))
   
   # HLINE POSITION
   hline_pos = grep("hline", table_split)
@@ -33,15 +37,15 @@ tabular = function(list_to_display,
   # BEGIN TAB include REGRESSION TYPE
   if(!is.null(reg.type)){
     begin_tab_align = c(begin_tab_align, "\\toprule",
-                        paste0(" & \\multicolumn{", length(list_to_display),"}{c}{", reg.type, "} \\\\"),
-                        paste0("\\cmidrule(lr){2-", length(list_to_display)+1, "}"))
+                        paste0(" & \\multicolumn{", esperluette_number,"}{c}{", reg.type, "} \\\\"),
+                        paste0("\\cmidrule(lr){2-", esperluette_number+1, "}"))
   }
   
   # CORE GROUPS
   if(!is.null(groups)){
     empty_line = NULL
     for(i in 1:length(groups)){
-    core[(groups[[i]][1]+i-1)*2-1] = paste0("\\midrule\\multicolumn{", length(list_to_display)+1,"}{l}{", 
+    core[(groups[[i]][1]+i-1)*2-1] = paste0("\\midrule\\multicolumn{", esperluette_number+1,"}{l}{", 
                                       names(groups[i]), "} \\\\ \\midrule")
     empty_line = c(empty_line, (groups[[i]][1]+i-1)*2)
     }
@@ -70,7 +74,8 @@ tabular = function(list_to_display,
     str_replace_all("\\s+", " ") %>% 
     str_replace(" & ", " &\\\\multicolumn{1}{c}{") %>% 
     str_replace_all(" & ", "} &\\\\multicolumn{1}{c}{") %>% 
-    str_replace_all(" \\\\\\\\", "}\\\\\\\\")
+    str_replace_all(" \\\\\\\\", "}\\\\\\\\") %>% 
+    str_replace_all("&\\\\multicolumn", "& \\\\multicolumn")
   
   # GROUPS MODEL
   if(!is.null(group.models)){
