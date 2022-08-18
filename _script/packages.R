@@ -2,7 +2,7 @@
 # List all packages
 packages <- c(
   # Load Data
-  "foreign", "haven",
+  "foreign", "haven", "readr",
   # Deal with Data
   "dplyr", "reshape2", "tidyr", "tidyselect", "data.table",
   "stringr", # String
