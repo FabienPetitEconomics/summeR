@@ -22,7 +22,7 @@ tabular = function(list_to_display,
     strsplit("\n") %>% 
     unlist
   
-  # Count the number of & in column [Because length(list_to_display) does is reduced for multinomial reg]
+  # Count the number of & in column [Because length(list_to_display) is reduced for multinomial reg]
   esperluette_number = lengths(regmatches(table_split[6], gregexpr("&", table_split[6])))
   
   # HLINE POSITION
