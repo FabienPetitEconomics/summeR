@@ -1,9 +1,9 @@
 # The tabular function is used to produce a regression table
 tabular = function(list_to_display, 
-         group.models = NULL, model_map = NULL,
-         coef_map = NULL, gof.row = NULL,
-         reg.type = NULL, groups = NULL,
-         ...){
+                   group.models = NULL, model_map = NULL,
+                   coef_map = NULL, gof.row = NULL,
+                   reg.type = NULL, groups = NULL,
+                   ...){
   
   table_split = texreg::texreg(
     list_to_display,
@@ -45,9 +45,9 @@ tabular = function(list_to_display,
   if(!is.null(groups)){
     empty_line = NULL
     for(i in 1:length(groups)){
-    core[(groups[[i]][1]+i-1)*2-1] = paste0("\\midrule\\multicolumn{", esperluette_number+1,"}{l}{", 
-                                      names(groups[i]), "} \\\\ \\midrule")
-    empty_line = c(empty_line, (groups[[i]][1]+i-1)*2)
+      core[(groups[[i]][1]+i-1)*2-1] = paste0("\\midrule\\multicolumn{", esperluette_number+1,"}{l}{", 
+                                              names(groups[i]), "} \\\\ \\midrule")
+      empty_line = c(empty_line, (groups[[i]][1]+i-1)*2)
     }
     core = core[-empty_line]
   }
@@ -79,27 +79,66 @@ tabular = function(list_to_display,
   
   # GROUPS MODEL
   if(!is.null(group.models)){
-    group.models.names <- ""
-    group.models.midrule <- NULL
-    for(i in 1:length(group.models)){
-      group.models.names = c(group.models.names, 
-                             paste0("\\multicolumn{", length(group.models[[i]]), "}{c}{", 
-                                    names(group.models)[i], "}")) %>% 
-        paste0(collapse = " & ")
+    
+    # If not a nested list
+    if(!any(sapply(group.models, is.list))){
       
-      group.models.midrule = c(group.models.midrule, 
-                               paste0("\\cmidrule(lr){", min(group.models[[i]])+1,"-", 
-                                      max(group.models[[i]])+1, "}")
-      )
+      group.models.names <- ""
+      group.models.midrule <- NULL
+      for(i in 1:length(group.models)){
+        group.models.names = c(group.models.names, 
+                               paste0("\\multicolumn{", length(group.models[[i]]), "}{c}{", 
+                                      names(group.models)[i], "}")) %>% 
+          paste0(collapse = " & ")
+        
+        group.models.midrule = c(group.models.midrule, 
+                                 paste0("\\cmidrule(lr){", min(group.models[[i]])+1,"-", 
+                                        max(group.models[[i]])+1, "}")
+        )
+      }
+      group.models.names = paste0(group.models.names, " \\\\")
+      group.models.midrule = paste0(group.models.midrule, collapse = "")
+      
+      group.models.outcome = c(group.models.names, group.models.midrule)
+      
     }
-    group.models.names = paste0(group.models.names, " \\\\")
-    group.models.midrule = paste0(group.models.midrule, collapse = "")
+    
+    # If a nested list
+    if(any(sapply(group.models, is.list))){
+      
+      group.models.outcome <- list()
+      
+      for(j in 1:length(group.models)){
+        
+        group.models.names <- ""
+        group.models.midrule <- NULL
+        for(i in 1:length(group.models[[j]])){
+          group.models.names = c(group.models.names, 
+                                 paste0("\\multicolumn{", length(group.models[[j]][[i]]), "}{c}{",
+                                        names(group.models[[j]])[i], "}")) %>% 
+            paste0(collapse = " & ")
+          
+          group.models.midrule = c(group.models.midrule, 
+                                   paste0("\\cmidrule(lr){", min(group.models[[j]][[i]])+1,"-", 
+                                          max(group.models[[j]][[i]])+1, "}")
+          )
+        }
+        group.models.names = paste0(group.models.names, " \\\\")
+        group.models.midrule = paste0(group.models.midrule, collapse = "")
+        
+        group.models.outcome[[j]] = c(group.models.names, group.models.midrule)
+      }
+      
+      group.models.outcome <- unlist(group.models.outcome, recursive = F)
+      
+    }
+    
   }
   
   # NEW TABLE
   new_table = begin_tab_align
   if(!is.null(group.models)){
-    new_table = c(new_table, group.models.names, group.models.midrule)
+    new_table = c(new_table, group.models.outcome)
   }
   new_table = c(new_table,
                 model_names,
